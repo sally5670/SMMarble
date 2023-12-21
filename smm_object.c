@@ -1,9 +1,3 @@
-//
-//  smm_node.c
-//  SMMarble
-//
-//  Created by Juyeop Kim on 2023/11/05.
-//
 
 #include "smm_common.h"
 #include "smm_object.h"
@@ -14,7 +8,7 @@
 #define MAX_NODE        100
 
 
-static char smmNodeName[SMMNODE_TYPE_MAX][MAX_CHARNAME] = {
+static char smmNodeName[SMMNODE_TYPE_MAX][MAX_CHARNAME] = {//노드 이름 정의 
        "강의",
        "식당",
        "실험실",
@@ -31,7 +25,7 @@ char* smmObj_getTypeName(int type)
 
 
 
-typedef enum smmObjGrade {
+typedef enum smmObjGrade {//성적 정의 
     smmObjGrade_Ap = 0,
     smmObjGrade_A0,
     smmObjGrade_Am,
@@ -58,19 +52,19 @@ typedef struct smmObject {
 
 //3. 관련 함수 변경 
 //object generation
-void* smmObj_genObject(char* name, smmObjType_e objType, int type, int credit, int energy, smmObjGrade_e grade)
+void* smmObj_genObject(char* name, smmObjType_e objType, int type, int credit, int energy, smmObjGrade_e grade)// SM Marble 게임의 객체 생성
 {    
     smmObject_t* ptr;
-    
+    // 동적 메모리 할당을 통해 smmObject_t 구조체 크기만큼의 메모리를 할당하고 
     ptr = (smmObject_t*)malloc(sizeof(smmObject_t));
-    
+    // 매개변수로 전달된 값들을 새로 생성한 객체에 설정
     strcpy(ptr->name, name);
     ptr->objType = objType;
     ptr->type = type;
     ptr->credit = credit;
     ptr->energy = energy;
     ptr->grade = grade;
-    
+    // 생성한 객체에 대한 포인터를 반환
     return ptr;
 }
 
