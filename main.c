@@ -1,8 +1,3 @@
-//  main.c
-//  SMMarble
-//
-//  Created by Juyeop Kim on 2023/11/05.
-//
 
 #include <time.h>
 #include <string.h>
@@ -54,14 +49,14 @@ void printGrades(int player); //print all the grade history of the player
 #endif
 
 
-void printGrades(int player)
+void printGrades(int player)// player 매개변수에 해당하는 플레이어의 성적을 출력
 {
      int i;
      void *gradePtr;
-     for (i=0;i<smmdb_len(LISTNO_OFFSET_GRADE + player);i++)
+     for (i=0;i<smmdb_len(LISTNO_OFFSET_GRADE + player);i++)//성적 데이터를 순회하고 특정 플레이어의 성적 리스트의 길이를 반환
      {
-         gradePtr = smmdb_getData(LISTNO_OFFSET_GRADE + player, i);
-         printf("%s : %i\n", smmObj_getNodeName(gradePtr), smmObj_getNodeGrade(gradePtr));
+         gradePtr = smmdb_getData(LISTNO_OFFSET_GRADE + player, i);//현재 반복 인덱스 i에 해당하는 특정 플레이어의 성적 데이터를 가져와서 gradePtr에 저장
+         printf("%s : %i\n", smmObj_getNodeName(gradePtr), smmObj_getNodeGrade(gradePtr));//성적 데이터이름,성적 데이터 점수 반환
      }
 }
 
@@ -71,11 +66,7 @@ void printPlayerStatus(void)
      
      for (i=0;i<player_nr;i++)
      {
-         printf("%s : credit %i, energy %i, position %i\n", 
-                      cur_player[i].name,
-                      cur_player[i].accumCredit,
-                      cur_player[i].energy,
-                      cur_player[i].position);
+         printf("%s : credit %i, energy %i, position %i\n",cur_player[i].name,cur_player[i].accumCredit,cur_player[i].energy,cur_player[i].position);
      }
 }
 
@@ -86,7 +77,7 @@ void generatePlayers(int n, int initEnergy) //generate a new player
      for (i=0;i<n;i++)
      {
          //input name
-         printf("Input player %i's name:", i); //??? ???? 
+         printf("Input player %i's name:", i); //플레이어 이름 입력 
          scanf("%s", cur_player[i].name);
          fflush(stdin);
          
@@ -106,12 +97,12 @@ void generatePlayers(int n, int initEnergy) //generate a new player
 int rolldie(int player)
 {
     char c;
-    printf(" Press any key to roll a die (press g to see grade): ");
+    printf(" Press any key to roll a die (press g to see grade): ");//주사위 굴리기 
     c = getchar();
     fflush(stdin);
     
-#if 1
-    if (c == 'g')
+#if 0
+    if (c == 'g')//g를 누르면 성적출력 
         printGrades(player);
 #endif
     
@@ -130,31 +121,57 @@ void actionNode(int player)
     switch(type)
     {
         //case lecture:
-        case SMMNODE_TYPE_LECTURE:
-             if 
-            cur_player[player].accumCredit += smmObj_getNodeCredit( boardPtr );
-            cur_player[player].energy -= smmObj_getNodeEnergy( boardPtr );
+        case SMNODE_TYPE_LECTURE:
+            if(1)
+            cur_player[player].accumCredit += smmObj_getNodeCredit( boardPtr );//특정 플레이어의 accumCredit에 해당 성적 데이터의 크레딧 값을 추가하여, 플레이어의 누적 크레딧 업데이트
+            cur_player[player].energy -= smmObj_getNodeEnergy( boardPtr );//특정 플레이어의 energy에서 해당 성적 데이터의 에너지 값을 빼서, 플레이어의 에너지를 업데이트
             
             //grade generation
-            gradePtr = smmObj_genObject(name, smmObjType_grade, 0, smmObj_getNodeCredit( boardPtr ), 0, ??);
+            //gradePtr = smmObj_genObject(name, smmObjType_grade, 0, smmObj_getNodeCredit( boardPtr ), 0, ??);//주어진 정보를 사용하여 새로운 성적 객체를 생성하고, 그 객체에 대한 포인터를 gradePtr에 저장
             smmdb_addTail(LISTNO_OFFSET_GRADE + player, gradePtr);
             
             break;
             
         default:
             break;
+     /*   
+    {
+    case 0:
+        printf("lecture"); //전공과목듣기 
+        break;
+    case 1:
+        printf("restaurant"); //에너지 보충
+        break;
+    case 2:
+        printf("laboratory"); //실험
+        break;
+    case 3:
+        printf("home"); //시작점이자 종료점 (지날때마다 에너지가 보충됨)
+        break;
+    case 4:
+        printf("experiment"); //실험을 하러 가는 노드 (실험실로 이동)
+        break;
+    case 5:
+        printf("foodChance"); //랜덤으로 음식카드를 골라 에너지를 보충할 수 있는 노드
+        break;
+    case 6:
+        printf("festival"); //랜덤으로 미션을 수행하는 노드
+        break;
+    default:
+        break;
     }
-}
+    }*/
+	}
 
-void goForward(int player, int step)
+void goForward(int player, int step)//앞으로 이동 
 {
      void *boardPtr;
-     cur_player[player].position += step;
+     cur_player[player].position += step;//player의 position을 이동함 
      boardPtr = smmdb_getData(LISTNO_NODE, cur_player[player].position );
      
-     printf("%s go to node %i (name: %s)\n"), 
+     printf("%s go to node %i (name: %s)\n", //이동한 상황 출력 
                 cur_player[player].name, cur_player[player].position,
-                smmObj_getNodeName(boardPtr);
+                smmObj_getNodeName(boardPtr));
 }
 
 
@@ -178,7 +195,7 @@ int main(int argc, const char * argv[]) {
     
     //1. import parameters ---------------------------------------------------------------------------------
     //1-1. boardConfig 
-    if ((fp = fopen(BOARDFILEPATH,"r")) == NULL)
+    if ((fp = fopen(BOARDFILEPATH,"r")) == NULL)//보드 열기 실패하였을때 
     {
         printf("[ERROR] failed to open %s. This file should be in the same directory of SMMarble.exe.\n", BOARDFILEPATH);
         getchar();
@@ -214,22 +231,80 @@ int main(int argc, const char * argv[]) {
     
     #if 0
     //2. food card config 
-    if ((fp = fopen(FOODFILEPATH,"r")) == NULL)
+    if ((fp = fopen(FOODFILEPATH,"r")) == NULL)//파일 오픈 실패시 
     {
         printf("[ERROR] failed to open %s. This file should be in the same directory of SMMarble.exe.\n", FOODFILEPATH);
         return -1;
     }
     
     printf("\n\nReading food card component......\n");
-    while () //read a food parameter set
+    while (fgets(line, sizeof(line), fp) != NULL) //read a food parameter set 
     {
         //store the parameter set
+        
+        //읽어오기
+        fscanf(fp, "%s %d", &name, &energy);
+        printf("%s / %d\n", name, energy);
+
+        //저장하기
+        smmObj_genNode(); //object.c에 있는 구조체에 정보저장
+        //이후 get함수로 정보를 가져와사용하기  
+        
+        food_nr++;
     }
     fclose(fp);
     printf("Total number of food cards : %i\n", food_nr);
     
     
     
+    
+    //3. festival card config 
+    if ((fp = fopen(FESTFILEPATH,"r")) == NULL)//파일 내용 없을때 
+    {
+        printf("[ERROR] failed to open %s. This file should be in the same directory of SMMarble.exe.\n", FESTFILEPATH);
+        return -1;
+    }
+    
+    printf("\n\nReading festival card component......\n");
+    while (fgets(line, sizeof(line), fp) != NULL) //read a festival card string
+    {
+        //store the parameter set
+        
+        //읽어오기
+        fscanf(fp, "%s", &name);
+        printf("%s\n", name);
+
+        //저장하기
+        smmObj_genNode(); //object.c에 있는 구조체에 정보저장
+        //이후 get함수로 정보를 가져와사용하기  
+        
+        festival_nr++;
+    }
+    fclose(fp);
+    printf("Total number of festival cards : %i\n", festival_nr);
+    #endif
+    
+    
+    //2. Player configuration ---------------------------------------------------------------------------------
+   
+   
+    do
+    {
+        //input player number to player_nr
+        printf("input player no.:");
+        scanf("%d", &player_nr);
+        fflush(stdin);
+    }
+    while (player_nr < 0 || player_nr >  MAX_PLAYER); //플레이어수가 0보다 크고 최대 플레이어수보다 작은경우동안 
+    
+    cur_player = (player_t*)malloc(player_nr * sizeof(player_t));//동적 할당을 사용하여 플레이어 구조체(player_t) 배열 생성
+    generatePlayers(player_nr, initEnergy);
+    
+    
+    
+    
+    
+    //3. SM Marble game starts ---------------------------------------------------------------------------------
     //3. festival card config 
     if ((fp = fopen(FESTFILEPATH,"r")) == NULL)
     {
@@ -238,34 +313,27 @@ int main(int argc, const char * argv[]) {
     }
     
     printf("\n\nReading festival card component......\n");
-    while () //read a festival card string
+    char line; 
+	while (fgets(line, sizeof(line), fp) != NULL) //read a festival card string
     {
         //store the parameter set
+        
+        //읽어오기
+        fscanf(fp, "%s", &name);
+        printf("%s\n", name);
+
+        //저장하기
+        smmObj_genNode(); //object.c에 있는 구조체에 정보저장
+        //이후 get함수로 정보를 가져와사용하기  
+        
+        festival_nr++;
     }
     fclose(fp);
     printf("Total number of festival cards : %i\n", festival_nr);
-    #endif
-    
-    
-    //2. Player configuration ---------------------------------------------------------------------------------
-    
-    do
-    {
-        //input player number to player_nr
-        printf("input player no.:");
-        scanf("%d", &player_nr);
-        fflush(stdin);
-    }
-    while (player_nr < 0 || player_nr >  MAX_PLAYER);
-    
-    cur_player = (player_t*)malloc(player_nr * sizeof(player_t));
-    generatePlayers(player_nr, initEnergy);
     
     
     
     
-    
-    //3. SM Marble game starts ---------------------------------------------------------------------------------
     while (1) //is anybody graduated?
     {
         int die_result;
